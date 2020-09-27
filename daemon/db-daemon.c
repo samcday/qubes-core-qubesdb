@@ -482,6 +482,13 @@ int mainloop(struct db_daemon_data *d) {
 
 #define MAX_FILE_PATH 256
 int init_server_socket(struct db_daemon_data *d) {
+#if HAVE_SYSTEMD
+    if (sd_listen_fds(0) == 1) {
+        d->socket_fd = SD_LISTEN_FDS_START + 0;
+        return 1;
+    }
+#endif
+
     char socket_address[MAX_FILE_PATH];
     struct sockaddr_un sockname;
     int s;
