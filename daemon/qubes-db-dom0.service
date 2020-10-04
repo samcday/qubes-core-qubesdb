@@ -1,12 +1,12 @@
 [Unit]
 Description=Qubes DB agent
-After=systemd-tmpfiles-setup.service
+After=xenstored.service
+Requires=xenstored.service
 
 [Service]
 # Both agent and daemon for dom0
 ExecStart=/usr/sbin/qubesdb-daemon 0 dom0
 Type=notify
-StandardOutput=syslog
 
 [Install]
 WantedBy=multi-user.target

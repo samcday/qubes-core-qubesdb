@@ -1,15 +1,12 @@
 [Unit]
 Description=Qubes DB agent
-After=systemd-modules-load.service fedora-loadmodules.service
-DefaultDependencies=no
+After=xenstored.service
+Requires=xenstored.service
 
 [Service]
-ExecStartPre=/bin/mkdir -p /var/run/qubes
 # Remote Dom ID as an argument
 ExecStart=/usr/sbin/qubesdb-daemon 0
 Type=notify
-StandardOutput=syslog
 
 [Install]
 WantedBy=sysinit.target
-
