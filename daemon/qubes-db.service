@@ -4,8 +4,7 @@ After=xenstored.service
 Requires=xenstored.service
 
 [Service]
-# Remote Dom ID as an argument
-ExecStart=/usr/sbin/qubesdb-daemon 0
+ExecStart=/usr/sbin/qubesdb-daemon
 Type=notify
 
 [Install]

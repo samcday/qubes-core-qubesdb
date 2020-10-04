@@ -649,8 +649,8 @@ void close_server_socket(struct db_daemon_data *d) {
 #endif // !WIN32
 
 void usage(char *argv0) {
-    fprintf(stderr, "Usage: %s <remote-domid> [<remote-name>]\n", argv0);
-    fprintf(stderr, "       Give <remote-name> only in dom0\n");
+    fprintf(stderr, "Usage: %s [<remote-domid>] [<remote-name>]\n", argv0);
+    fprintf(stderr, "       Give <remote-domid> + <remote-name> only in dom0\n");
 }
 
 #ifdef WIN32
@@ -690,18 +690,21 @@ int fuzz_main(int argc, char **argv) {
     under_systemd = getenv("NOTIFY_SOCKET") != NULL;
 #endif
 
-    if (argc != 2 && argc != 3 && argc != 4) {
+    if (argc != 1 && argc != 3) {
         usage(argv[0]);
         exit(1);
     }
 
     memset(&d, 0, sizeof(d));
 
-    d.remote_domid = atoi(argv[1]);
-    if (argc >= 3 && strlen(argv[2]) > 0)
+    // Unless remote id + name is given, we assume we're connecting to dom0.
+    d.remote_domid = 0;
+    d.remote_name = "dom0";
+
+    if (argc == 3 && strlen(argv[2]) > 0) {
+        d.remote_domid = atoi(argv[1]);
         d.remote_name = argv[2];
-    else
-        d.remote_name = NULL;
+    }
 
     /* if not running under SystemD, fork and use pipe() to notify parent about
      * sucessful start */
