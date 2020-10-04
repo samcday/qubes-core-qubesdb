@@ -765,7 +765,11 @@ int fuzz_main(int argc, char **argv) {
         exit(1);
     }
 
-    if (!init_server_socket(&d)) {
+    int systemd_socket = under_systemd && (sd_listen_fds(0) == 1);
+    if (systemd_socket) {
+        fprintf(stderr, "accepting socket from systemd\n");
+        d.socket_fd = SD_LISTEN_FDS_START + 0;
+    } else if (!init_server_socket(&d)) {
         fprintf(stderr, "FATAL: server socket initialization failed\n");
         exit(1);
     }
@@ -827,7 +831,8 @@ int fuzz_main(int argc, char **argv) {
     if (d.vchan)
         libvchan_close(d.vchan);
 
-    close_server_socket(&d);
+    if (!systemd_socket)
+        close_server_socket(&d);
 
 #ifndef WIN32
     if (!under_systemd) {
